@@ -6,14 +6,19 @@ csv_path: /workspace/KYM-PINN/data/widecrack_W10_L2_H4_D1.csv
 
 # ---- training ----
 batch_size: 512
-num_workers: 8          # 필요시 2~4로 올려볼 수 있음
+num_workers: 4          # 필요시 2~4로 올려볼 수 있음
 total_steps: 50000
 eval_interval: 1000
 kfold_n: 5              # time index 기준 K-fold 개수 (1이면 실제로는 fold 없음)
 
-# ---- physics (필요한 만큼만) ----
-Lz: 0.005                # [m] plate thickness
-T_ext: 293.15           # [K]
+# 1D/2D 선택
+model_dimension: 2   # 1 -> AirGapPINN1D, 2 -> AirGapPINN2D
+
+# 2D일 때 x 방향 길이
+Lx: 0.01             # [m], 필요한 값으로 수정
+
+Lz: 0.01
+T_ext: 293.15
 k_s: 20.0
 rho_s: 7800.0
 c_s: 500.0

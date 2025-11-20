@@ -4,10 +4,15 @@ seed: 777
 result_save_root: /workspace/KYM-PINN/results
 csv_path: /workspace/KYM-PINN/data/widecrack_W10_L2_H4_D1.csv
 
-kfold_n: 5
+# ---- training ----
+batch_size: 512
+num_workers: 4          # 필요시 2~4로 올려볼 수 있음
+total_steps: 50000
+eval_interval: 1000
+kfold_n: 5              # time index 기준 K-fold 개수 (1이면 실제로는 fold 없음)
 
 # 1D/2D 선택
-model_dimension: 2   # 1 -> AirGapPINN1D, 2 -> AirGapPINN2D
+model_dimension: 1   # 1 -> AirGapPINN1D, 2 -> AirGapPINN2D
 
 # 2D일 때 x 방향 길이
 Lx: 0.01             # [m], 필요한 값으로 수정

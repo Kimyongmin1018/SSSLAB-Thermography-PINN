@@ -385,7 +385,19 @@ def run_experiment(
             x_data = x_data.to(device)
             T_data = T_data.to(device)
 
-            loss_data = model.data_loss(x_data, T_data)
+            # 1D / 2D에 따라 입력 형식 맞추기
+            if model_dim == 1:
+                # 1D 모델: Dataset이 이미 [z, t] 형태이므로 그대로 사용
+                x_for_model = x_data  # (B, 2)
+            else:
+                # 2D 모델: Dataset은 [z, t]만 있으므로,
+                # x=0을 앞에 붙여 [x, z, t] 형태로 확장
+                z = x_data[:, 0:1]              # (B, 1)
+                t = x_data[:, 1:2]              # (B, 1)
+                x_coord = torch.zeros_like(z)   # (B, 1), x=0
+                x_for_model = torch.cat([x_coord, z, t], dim=1)  # (B, 3)
+
+            loss_data = model.data_loss(x_for_model, T_data)
 
             # 총 손실
             loss = (
@@ -401,7 +413,7 @@ def run_experiment(
             train_data_loss_list.append(loss_data.item())
 
             with torch.no_grad():
-                T_pred_batch = model(x_data)
+                T_pred_batch = model(x_for_model)
 
                 # Kelvin -> Celsius 변환 (metric에서만 사용)
                 T_data_C = T_data - 273.15
@@ -419,6 +431,7 @@ def run_experiment(
                     else:
                         raise NotImplementedError(f"Unsupported metric: {mname}")
                     train_metric_lists[idx].append(v)
+
 
             # ----- eval -----
             if (
@@ -440,8 +453,18 @@ def run_experiment(
                     for x_val, T_val in valid_loader:
                         x_val = x_val.to(device)
                         T_val = T_val.to(device)
-                        T_pred_val = model(x_val)
-                        v_loss = model.data_loss(x_val, T_val)
+
+                        # 1D / 2D에 따라 입력 형식 맞추기
+                        if model_dim == 1:
+                            x_for_model = x_val  # (B, 2) = [z, t]
+                        else:
+                            z = x_val[:, 0:1]
+                            t = x_val[:, 1:2]
+                            x_coord = torch.zeros_like(z)
+                            x_for_model = torch.cat([x_coord, z, t], dim=1)  # (B, 3) = [x, z, t]
+
+                        T_pred_val = model(x_for_model)
+                        v_loss = model.data_loss(x_for_model, T_val)
                         val_data_loss_list.append(v_loss.item())
 
                         # Kelvin -> Celsius 변환 (metric에서만 사용)
@@ -459,6 +482,7 @@ def run_experiment(
                             else:
                                 raise NotImplementedError(f"Unsupported metric: {mname}")
                             val_metric_lists[idx].append(v)
+
 
 
                 val_data_loss_mean = float(np.mean(val_data_loss_list)) if val_data_loss_list else 0.0
