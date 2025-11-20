@@ -1,0 +1,60 @@
+gpu_id: 1
+seed: 777
+
+result_save_root: /workspace/KYM-PINN/results
+csv_path: /workspace/KYM-PINN/data/widecrack_W10_L2_H4_D1.csv
+
+# ---- training ----
+batch_size: 512
+num_workers: 8          # 필요시 2~4로 올려볼 수 있음
+total_steps: 50000
+eval_interval: 1000
+kfold_n: 5              # time index 기준 K-fold 개수 (1이면 실제로는 fold 없음)
+
+# ---- physics (필요한 만큼만) ----
+Lz: 0.005                # [m] plate thickness
+T_ext: 293.15           # [K]
+k_s: 20.0
+rho_s: 7800.0
+c_s: 500.0
+k_a: 0.026
+rho_a: 1.2
+c_a: 1000.0
+h_front: 20.0
+eps_r: 1.0
+sigma: 5.670374419e-8
+
+# 결함 초기 위치 (중간에 있다고 가정)
+z0_init: 0.001          # [m] 예: 1 mm
+z1_init: 0.005          # [m] 예: 5 mm
+
+# ---- pulse (예시) ----
+q0: 50000.0             # [W/m^2]
+t_pulse_start: 0.0
+t_pulse_end: 0.1
+
+# ---- collocation sizes ----
+N_f: 20000   # PDE interior points
+N_ic: 2000
+N_bc_front: 2000
+N_bc_back: 2000
+
+
+# ---- loss weights ----
+w_pde: 1.0
+w_ic: 1.0
+w_bc: 1.0
+w_data: 1.0
+
+# ---- 하이퍼파라미터 (검색이 필요 없으면 _search 안 써도 됨) ----
+hparams:
+  lr: 0.001
+  optimizer_name: AdamW
+  ff_dim_search: [128, 256, 512]
+  num_blocks_search: [2, 4, 8, 16]
+  activation_fn_search: [tanh, relu, gelu]
+  metric_names:
+    - MAE
+    - MAPE
+  # 예: lr_search 로 여러 값 탐색하고 싶으면:
+  # lr_search: [0.001, 0.0005]

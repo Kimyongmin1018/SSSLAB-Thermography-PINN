@@ -1,0 +1,55 @@
+# ------------------------
+# Python bytecode / cache
+# ------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# ------------------------
+# Distribution / packaging
+# ------------------------
+build/
+dist/
+.eggs/
+*.egg-info/
+
+# ------------------------
+# Virtual environments
+# ------------------------
+.venv/
+venv/
+env/
+ENV/
+
+# ------------------------
+# Jupyter Notebook checkpoints
+# ------------------------
+.ipynb_checkpoints/
+
+# ------------------------
+# OS / Editor files
+# ------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ------------------------
+# Checkpoint / model weights (원하지 않으면 주석 처리)
+# ------------------------
+*.pt
+*.pth
+*.ckpt
+
+# ------------------------
+# Project-specific: 결과 / 레퍼런스 제외
+# ------------------------
+
+# results 폴더 전체 무시 (로그, weight, tensorboard 등)
+results/
+
+# reference 폴더 전체 무시
+reference/
